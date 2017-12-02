@@ -1,7 +1,9 @@
 %{
+    #include"Node.h"
     #include<iostream>
     #include<string>
-    #include<flang.tab.h>
+    #include"flang.tab.h"
+    int col = 1;
     using namespace std;
 %}
 
@@ -23,6 +25,11 @@ COMMENT "//".*
 
 
     /* Keywords */
+"main" {
+    col += yyleng;
+    return MAIN;
+}
+
 "int" {
     col += yyleng;
     return INT;
