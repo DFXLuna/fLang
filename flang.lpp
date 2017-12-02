@@ -1,8 +1,8 @@
 %{
     #include<iostream>
     #include<string>
+    #include<flang.tab.h>
     using namespace std;
-
 %}
 
 %option outfile ="flang_lex.cpp"
