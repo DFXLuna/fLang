@@ -19,7 +19,7 @@
     Node* ttype;
 }
 
-%type<ttype> funcdefs funcdef type plist param stmts stmt main funccalls
+%type<ttype> funcdefs funcdef type plist param main funccalls
 %type<ttype> funccall alist arg expr
 %token<ttype> NUM ID 
 %token SEMICOLON DOT COMMA
@@ -39,90 +39,99 @@ funcdefs: funcdef {}
         | funcdef funcdefs {}
 ;
 
-funcdef: type ID LPAREN plist RPAREN LSBRACE stmts RSBRACE {}
+funcdef: type ID LPAREN plist RPAREN LSBRACE funccalls RSBRACE {}
 ;
 
-plist: param {}
-     | param plist {}
+plist: param {
+         $$ = new PListNode( $1, 0 );
+     }
+     | param COMMA plist {
+         $$ = new PListNode( $1, $2 );
+     }
 ;
 
-param: type ID {}
+param: type ID {
+         $$ = new ParamNode( $1, $2 );
+     }
 ;
 
-type: INT {}
-;
-
-stmts: stmt {}
-     | stmt stmts {}
-;
-
-stmt: expr SEMICOLON {}
+type: INT {
+        $$ = new TypeNode( "int" );
+    }
 ;
 
 main: MAIN LPAREN plist RPAREN LSBRACE funccalls RSBRACE {}
 ;
 
-funccalls: funccall {}
-         | funccall funccalls {}
+funccalls: funccall SEMICOLON {
+             $$ = new FuncCallsNode( $1, 0 );
+         }
+         | funccall SEMICOLON funccalls {
+             $$ = new FuncCallsNode( $1, $3 );
+         }
 ;
 
-funccall: ID LPAREN alist RPAREN SEMICOLON {}
+funccall: ID LPAREN alist RPAREN {
+            $$ = new FuncCallNode( $1, $3 );
+        }
 ;
 
-alist: arg {}
-     | arg alist {}
+alist: arg {
+         $$ = new AlistNode( $1, 0 );
+     }
+     | arg COMMA alist {
+         $$ = new AlistNode( $1, $3 );
+     }
 ;
 
-arg: ID {}
+arg: expr {
+       $1 = new ArgNode( $1 );
+   }
 ;
 
-expr: 
-    NUM {
-        $$ = $1;
-    }
-    | ID LPAREN alist RPAREN {
-        //$$ = new MethodCallNode($1, $3);
+expr: ID LPAREN alist RPAREN {
+        $$ = new MethodCallNode( $1, $3 );
     }
     | expr PLUS expr  {
-        //$$ = new SumNode($1, $3);
+        $$ = new SumNode( $1, $3 );
     }
     | expr MINUS expr {
-        //$$ = new MinusNode($1, $3);
+        $$ = new MinusNode( $1, $3 );
     }
     | expr EQ expr {
-        //$$ = new EqNode($1, $3);
+        $$ = new EqNode( $1, $3 );
     }
     | expr NEQ expr {
-        //$$ = new NeqNode($1, $3);
+        $$ = new NeqNode( $1, $3 );
     }
     | expr LEQ expr {
-        //$$ = new LeqNode($1, $3);
+        $$ = new LeqNode( $1, $3 );
     }
     | expr GEQ expr {
-        //$$ = new GeqNode($1, $3);
+        $$ = new GeqNode( $1, $3 );
     }
     | expr LESS expr {
-        //$$ = new LessNode($1, $3);
+        $$ = new LessNode( $1, $3 );
     }
     | expr GREATER expr {
-        //$$ = new GreaterNode($1, $3);
+        $$ = new GreaterNode( $1, $3 );
     }
     | expr TIMES expr {
-        //$$ = new TimesNode($1, $3);
+        $$ = new TimesNode( $1, $3 );
     }
     | expr DIV expr {
-        //$$ = new DivNode($1, $3);
+        $$ = new DivNode( $1, $3 );
     }
     | expr MOD expr {
-        //$$ = new ModNode($1, $3);
+        $$ = new ModNode( $1, $3 );
     }
     | PLUS expr %prec UNARYOP {
-        //$$ = new UPlusNode($2);
+        $$ = new UPlusNode( $2 );
     }
     | MINUS expr %prec UNARYOP {
-        //$$ = new UMinusNode($2);
+        $$ = new UMinusNode( $2 );
     }
     | LPAREN expr RPAREN {
-        //$$ = new ParenNode($2);
+        $$ = new ParenNode( $2 );
     }
 ;

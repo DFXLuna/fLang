@@ -17,7 +17,7 @@
 WS      [" ""\t"]+
 WORD    [_a-zA-Z][_a-zA-Z0-9]*
 ONEOP   [\[\]\{\}<>!+\-*/%;,()=.]
-TWOOP   "!="|"=="|"<="|">="|"&&"|"||"
+TWOOP   "!="|"=="|"<="|">="
 OP      {ONEOP}|{TWOOP}
 COMMENT "//".*
 
@@ -81,11 +81,6 @@ COMMENT "//".*
 \; {
     col += yyleng;
     return SEMICOLON;
-}
-
-\= {
-    col += yyleng;
-    return EQ;
 }
 
     /* Braces */
