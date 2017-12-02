@@ -9,20 +9,13 @@ LEXFLAGS=--warn
 
 .PHONY: clean test
 
-program5: program5.cpp program5_lex.cpp program5.tab.c program5.tab.h node.h node.cpp tables.h tables.cpp
-	${CXX} ${CXXFLAGS} program5.cpp program5.tab.c program5_lex.cpp node.cpp tables.cpp -o program5
+flang: flang.cpp flang.lpp
+	${CXX} ${CXXFLAGS} program5.cpp flang_lex.cpp -o flang
 
-program5.tab.c: program5.y node.h
-	${YACC} ${YFLAGS} program5.y
 
-program5_lex.cpp: program5.lpp node.h
-	${LEX} ${LEXFLAGS} program5.lpp
-
-test: testrig.cpp tables.h tables.cpp
-	${CXX} ${CXXFLAGS} testrig.cpp tables.cpp -o test
-	./test
+flang_lex.cpp: flang.lpp
+	${LEX} ${LEXFLAGS} flang.lpp
 
 clean:
-	/bin/rm -f program5 program5_lex.cpp program5.tab.c program5.tab.h program5.output test
-	
+	/bin/rm -f flang flang_lex.cpp	
 
