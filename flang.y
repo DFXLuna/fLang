@@ -20,7 +20,7 @@
 }
 
 %type<ttype> funcdefs funcdef type plist param main funccalls
-%type<ttype> funccall alist arg expr program
+%type<ttype> funccall alist arg expr program ret primexpr
 %token<ttype> NUM ID 
 %token SEMICOLON DOT COMMA
 %token INT RETURN VOID MAIN
@@ -46,11 +46,19 @@ funcdefs: funcdef {
         }
 ;
 
-funcdef: type ID LPAREN plist RPAREN LSBRACE funccalls RSBRACE {
-           $$ = new FuncDefNode( $1, $2, $4, $7 );
+funcdef: type ID LPAREN plist RPAREN LSBRACE funccalls ret RSBRACE {
+           $$ = new FuncDefNode( $1, $2, $4, $7, $8 );
+       }
+       |
+       type ID LPAREN plist RPAREN LSBRACE funccalls RSBRACE {
+           $$ = new FuncDefNode( $1, $2, $4, $7, 0 );
+       }
+       |
+       type ID LPAREN plist RPAREN LSBRACE ret RSBRACE {
+           $$ = new FuncDefNode( $1, $2, $4, 0, $7 );
        }
        | type ID LPAREN plist RPAREN LSBRACE RSBRACE {
-           $$ = new FuncDefNode( $1, $2, $4, 0 );
+           $$ = new FuncDefNode( $1, $2, $4, 0, 0 );
        }
 ;
 
@@ -110,6 +118,22 @@ alist: %empty {
 arg: expr {
        $1 = new ArgNode( $1 );
    }
+;
+
+ret: RETURN SEMICOLON {
+       $$ = new ReturnNode( 0 );
+   }
+   | RETURN expr SEMICOLON {
+       $$ = new ReturnNode( $2 );
+   }
+   | RETURN primexpr SEMICOLON {
+       $$ = new ReturnNode( $2 );
+   }
+;
+
+primexpr: NUM {
+            $$ = new PrimitiveExpr( $1 );
+        }
 ;
 
 expr: funccall {

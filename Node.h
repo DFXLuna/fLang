@@ -44,9 +44,10 @@ public:
 class FuncDefNode : public Node {
 public:
     FuncDefNode( Node* type = 0, Node* id = 0, 
-                 Node* plist = 0, Node* funcs = 0 );
+                 Node* plist = 0, Node* funcs = 0, Node* ret = 0 );
     ~FuncDefNode();
 private:
+    Node* ret;
     Node* plist;
     Node* funcs;
 };
@@ -104,6 +105,21 @@ public:
 class MainNode : public Node {
 public:
     MainNode( Node* plist = 0, Node* funccalls = 0 );
+};
+
+/////////////////////////////////////////
+// Return
+class ReturnNode : public Node {
+public:
+    ReturnNode( Node* expr = 0 );
+};
+
+
+/////////////////////////////////////////
+// Primitive Expression
+class PrimitiveExpr : public Node {
+public:
+    PrimitiveExpr( Node* p = 0 );
 };
 
 /////////////////////////////////////////

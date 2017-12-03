@@ -33,12 +33,17 @@ Node( funcdefs, main ){}
 FuncDefsNode::FuncDefsNode( Node* funcdef, Node* next ):
 Node( funcdef, next ){}
 
-FuncDefNode::FuncDefNode( Node* type, Node* id, Node* plist, Node* funcs ):
-Node( type, id ){}
+FuncDefNode::FuncDefNode( Node* type, Node* id, Node* plist, 
+Node* funcs, Node* ret ): Node( type, id ){
+    this->plist = plist;
+    this->funcs = funcs;
+    this->ret   = ret;
+}
 
 FuncDefNode::~FuncDefNode(){
     delete plist;
     delete funcs;
+    delete ret;
 }
 
 TypeNode::TypeNode( string val ){
@@ -71,19 +76,27 @@ FuncCallNode::FuncCallNode( Node* id, Node* alist ): Node( id, alist ){}
 MainNode::MainNode( Node* plist, Node* funccalls ): Node( plist, funccalls ){}
 
 /////////////////////////////////////////
+// Return
+
+ReturnNode::ReturnNode( Node* expr ): Node( expr, 0 ){}
+
+/////////////////////////////////////////
+// Primitive Expression
+
+PrimitiveExpr::PrimitiveExpr( Node* p ): Node( p, 0 ){}
+
+/////////////////////////////////////////
 // Expression Nodes
 // Sum nodes
-SumNode::SumNode( Node* l, Node* r ): Node( l, r ){}
 
+SumNode::SumNode( Node* l, Node* r ): Node( l, r ){}
 
 //// 
 
 MinusNode::MinusNode( Node* l, Node* r ): Node( l, r ){}
 
-
 // Relation Nodes
 EqNode::EqNode( Node* l, Node* r ): Node( l, r ){}
-
 
 //// 
 
