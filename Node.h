@@ -28,23 +28,36 @@ private:
     int val;
 };
 
+class ProgramNode : public Node {
+public:
+    ProgramNode( Node* funcdefs = 0, Node* main = 0 );
+};
+
 /////////////////////////////////////////
 // Function Definiton
+class FuncDefsNode : public Node {
+public:
+    FuncDefsNode( Node* FuncDef = 0, Node* next = 0 );
+};
 
-// class FuncDefNode : public Node {
-// public:
-//     FuncDefNode( Node* type = 0, Node* id = 0, 
-//                  Node* plist = 0, Node* funcs = 0 );
-//     ~FuncDefNode();
-// private:
-//     Node* plist;
-//     Node* funcs;
-// };
+
+class FuncDefNode : public Node {
+public:
+    FuncDefNode( Node* type = 0, Node* id = 0, 
+                 Node* plist = 0, Node* funcs = 0 );
+    ~FuncDefNode();
+private:
+    Node* plist;
+    Node* funcs;
+};
 
 /////////////////////////////////////////
 // Type
 class TypeNode : public Node {
-    TypeNode( string type );
+public:
+    TypeNode( string val );
+private:
+    string val;
 };
 
 /////////////////////////////////////////
@@ -55,6 +68,7 @@ public:
 };
 
 class ParamNode : public Node {
+public:
     ParamNode( Node* type = 0, Node* id = 0 );
 };
 
@@ -86,13 +100,14 @@ public:
 };
 
 /////////////////////////////////////////
-// Expressions
-
-
-class MethodCallNode : public Node {
+// Main
+class MainNode : public Node {
 public:
-    MethodCallNode( Node* name = 0, Node* arglist = 0 );
+    MainNode( Node* plist = 0, Node* funccalls = 0 );
 };
+
+/////////////////////////////////////////
+// Expressions
 
 // Sum/Unary Operators
 class MinusNode : public Node {

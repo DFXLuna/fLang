@@ -20,5 +20,5 @@ flang.tab.h: flang.y Node.h
 	${YACC} ${YFLAGS} flang.y
 
 clean:
-	/bin/rm -f flang flang_lex.cpp	
+	/bin/rm -f flang flang_lex.cpp flang.tab.c flang.tab.h	
 

@@ -9,7 +9,7 @@
     void yyerror(const char*){}
 
     extern yyFlexLexer scanner;
-    extern vector<Node*> tree;
+    extern Node* tree;
 
     #define yylex() scanner.yylex()
 %}
@@ -20,7 +20,7 @@
 }
 
 %type<ttype> funcdefs funcdef type plist param main funccalls
-%type<ttype> funccall alist arg expr
+%type<ttype> funccall alist arg expr program
 %token<ttype> NUM ID 
 %token SEMICOLON DOT COMMA
 %token INT RETURN VOID MAIN
@@ -32,21 +32,36 @@
 
 %%
 
-program: funcdefs main {}
+program: funcdefs main {
+           $$ = 0;
+           tree = new ProgramNode( $1, $2 );
+       }
 ;
 
-funcdefs: funcdef {}
-        | funcdef funcdefs {}
+funcdefs: funcdef {
+            $$ = new FuncDefsNode( $1, 0 );
+        }
+        | funcdef funcdefs {
+            $$ = new FuncDefsNode( $1, $2 );
+        }
 ;
 
-funcdef: type ID LPAREN plist RPAREN LSBRACE funccalls RSBRACE {}
+funcdef: type ID LPAREN plist RPAREN LSBRACE funccalls RSBRACE {
+           $$ = new FuncDefNode( $1, $2, $4, $7 );
+       }
+       | type ID LPAREN plist RPAREN LSBRACE RSBRACE {
+           $$ = new FuncDefNode( $1, $2, $4, 0 );
+       }
 ;
 
-plist: param {
-         $$ = new PListNode( $1, 0 );
+plist: %empty {
+         $$ = 0;
+     }
+     | param {
+         $$ = new PlistNode( $1, 0 );
      }
      | param COMMA plist {
-         $$ = new PListNode( $1, $2 );
+         $$ = new PlistNode( $1, $3 );
      }
 ;
 
@@ -60,14 +75,19 @@ type: INT {
     }
 ;
 
-main: MAIN LPAREN plist RPAREN LSBRACE funccalls RSBRACE {}
+main: MAIN LPAREN plist RPAREN LSBRACE funccalls RSBRACE {
+        $$ = new MainNode( $3, $6 );
+    }
+    | MAIN LPAREN plist RPAREN LSBRACE RSBRACE {
+        $$ = new MainNode( $3, 0 );
+    }
 ;
 
-funccalls: funccall SEMICOLON {
+funccalls:  funccall SEMICOLON {
              $$ = new FuncCallsNode( $1, 0 );
          }
-         | funccall SEMICOLON funccalls {
-             $$ = new FuncCallsNode( $1, $3 );
+         | funccalls funccall SEMICOLON {
+             $$ = new FuncCallsNode( $2, $1 );
          }
 ;
 
@@ -76,7 +96,10 @@ funccall: ID LPAREN alist RPAREN {
         }
 ;
 
-alist: arg {
+alist: %empty {
+         $$ = 0;
+     }
+     | arg {
          $$ = new AlistNode( $1, 0 );
      }
      | arg COMMA alist {
@@ -89,8 +112,8 @@ arg: expr {
    }
 ;
 
-expr: ID LPAREN alist RPAREN {
-        $$ = new MethodCallNode( $1, $3 );
+expr: funccall {
+        $$ = $1;
     }
     | expr PLUS expr  {
         $$ = new SumNode( $1, $3 );
