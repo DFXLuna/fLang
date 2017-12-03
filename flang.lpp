@@ -68,11 +68,6 @@ COMMENT "//".*
     return ID;
 }
 
-\. {
-    col += yyleng;
-    return DOT;
-}
-
 \, {
     col += yyleng;
     return COMMA;

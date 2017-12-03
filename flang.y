@@ -22,7 +22,7 @@
 %type<ttype> funcdefs funcdef type plist param main funccalls
 %type<ttype> funccall alist arg expr program ret primexpr
 %token<ttype> NUM ID 
-%token SEMICOLON DOT COMMA
+%token SEMICOLON COMMA
 %token INT RETURN VOID MAIN
 %token LPAREN RPAREN LBRACE RBRACE LSBRACE RSBRACE
 %left EQ NEQ LEQ GEQ LESS GREATER
@@ -80,6 +80,10 @@ param: type ID {
 
 type: INT {
         $$ = new TypeNode( "int" );
+    }
+    |
+    VOID {
+        $$ = new TypeNode("void");
     }
 ;
 
