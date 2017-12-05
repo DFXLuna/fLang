@@ -1,0 +1,8 @@
+int funcA(){}
+void funcB( int a ){
+    return;
+}
+
+main(){
+    funcB( funcA() );
+}

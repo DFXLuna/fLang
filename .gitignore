@@ -1,8 +1,8 @@
 # User added files
-program5
+flang
 *.output
 *.tab.*
-program5_lex.cpp
+flang_lex.cpp
 .vscode*
 test
 

@@ -1,13 +1,17 @@
 #ifndef NODE_H
 #define NODE_H
 #include<string>
+#include<iostream>
+using std::cout;
+using std::endl;
 using std::string;
 
 class Node {
 public:
     Node( Node* left = 0, Node* right = 0 );
     virtual ~Node();
-private:
+    virtual void print();
+protected:
     Node* left;
     Node* right;
 };
@@ -17,6 +21,7 @@ private:
 class IdNode : public Node {
 public:
     IdNode( string val );
+    void print();
 private:
     string val;
 };
@@ -24,6 +29,7 @@ private:
 class NumNode : public Node {
 public:
     NumNode( int );
+    void print();
 private:
     int val;
 };
@@ -31,6 +37,7 @@ private:
 class ProgramNode : public Node {
 public:
     ProgramNode( Node* funcdefs = 0, Node* main = 0 );
+    void print();
 };
 
 /////////////////////////////////////////
@@ -38,6 +45,7 @@ public:
 class FuncDefsNode : public Node {
 public:
     FuncDefsNode( Node* FuncDef = 0, Node* next = 0 );
+    void print();
 };
 
 
@@ -45,6 +53,7 @@ class FuncDefNode : public Node {
 public:
     FuncDefNode( Node* type = 0, Node* id = 0, 
                  Node* plist = 0, Node* funcs = 0, Node* ret = 0 );
+    void print(); 
     ~FuncDefNode();
 private:
     Node* ret;
@@ -57,6 +66,7 @@ private:
 class TypeNode : public Node {
 public:
     TypeNode( string val );
+    void print();
 private:
     string val;
 };
@@ -66,11 +76,13 @@ private:
 class PlistNode : public Node {
 public:
     PlistNode( Node* param = 0, Node* next = 0 );
+    void print();
 };
 
 class ParamNode : public Node {
 public:
     ParamNode( Node* type = 0, Node* id = 0 );
+    void print();
 };
 
 /////////////////////////////////////////
@@ -79,11 +91,13 @@ public:
 class AlistNode : public Node {
 public:
     AlistNode( Node* arg = 0, Node* next = 0 );
+    void print();
 };
 
 class ArgNode : public Node {
 public:
     ArgNode( Node* expr = 0 );
+    void print();
 };
 
 
@@ -93,11 +107,13 @@ public:
 class FuncCallsNode : public Node {
 public:
     FuncCallsNode( Node* funcCall = 0, Node* next = 0 );
+    void print();
 };
 
 class FuncCallNode : public Node {
 public:
     FuncCallNode( Node* id = 0, Node* alist = 0 );
+    void print();
 };
 
 /////////////////////////////////////////
@@ -105,6 +121,7 @@ public:
 class MainNode : public Node {
 public:
     MainNode( Node* plist = 0, Node* funccalls = 0 );
+    void print();
 };
 
 /////////////////////////////////////////
@@ -112,14 +129,16 @@ public:
 class ReturnNode : public Node {
 public:
     ReturnNode( Node* expr = 0 );
+    void print();
 };
 
 
 /////////////////////////////////////////
 // Primitive Expression
-class PrimitiveExpr : public Node {
+class PrimitiveExprNode : public Node {
 public:
-    PrimitiveExpr( Node* p = 0 );
+    PrimitiveExprNode( Node* p = 0 );
+    void print();
 };
 
 /////////////////////////////////////////

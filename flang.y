@@ -136,7 +136,7 @@ ret: RETURN SEMICOLON {
 ;
 
 primexpr: NUM {
-            $$ = new PrimitiveExpr( $1 );
+            $$ = new PrimitiveExprNode( $1 );
         }
 ;
 

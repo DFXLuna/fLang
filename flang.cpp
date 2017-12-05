@@ -12,6 +12,7 @@ int main(){
     yyparse();
     if( tree != 0 ){
         cout << "Success!" << endl;
+        tree->print();
     }
     return 0;
 }
