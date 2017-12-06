@@ -5,6 +5,26 @@ Node::Node( Node* left, Node* right ){
     this->right = right;
 }
 
+bool Node::populateTables( TypeChecker* tc ){
+    // ERROR
+    return false;
+}
+
+bool Node::tryGetId( string& result ){
+    // ERROR
+    return false;
+}
+
+bool Node::tryGatherParams( vector<string>& result ){
+    // ERROR
+    return false;
+}
+
+bool Node::typeCheck( TypeChecker* tc ){
+    // ERROR
+    return false;
+}
+
 void Node::print(){
     cout << "Base Node / Expr Node" << endl;
 }
@@ -28,6 +48,11 @@ IdNode::IdNode( string val ): Node( 0, 0 ){
     this->val = val;
 }
 
+bool IdNode::tryGetId( string& result ){
+    result = val;
+    return true;
+}
+
 void IdNode::print(){
     cout << "IdNode" << endl;
 }
@@ -37,6 +62,17 @@ void IdNode::print(){
 
 ProgramNode::ProgramNode( Node* funcdefs, Node* main ):
 Node( funcdefs, main ){}
+
+bool ProgramNode::populateTables( TypeChecker* tc ){
+    if( left ){ return left->populateTables( tc ); }
+    else{
+        return false;
+    }
+}
+
+bool ProgramNode::typeCheck( TypeChecker* tc ){
+    return left->typeCheck( tc ) && right->typeCheck( tc );
+}
 
 void ProgramNode::print(){
     cout << "ProgramNode" << endl;
@@ -54,12 +90,57 @@ void FuncDefsNode::print(){
     cout << "FuncDefsNode" << endl;
 }
 
+bool FuncDefsNode::populateTables( TypeChecker* tc ){
+    if( right ){
+        return left->populateTables( tc ) && right->populateTables( tc );
+    }
+    return left->populateTables( tc );
+}
+
+bool FuncDefsNode::typeCheck( TypeChecker* tc ){
+    if( right ){ 
+        return left->typeCheck( tc ) && right->typeCheck( tc );
+    }
+    return left->typeCheck( tc );
+}
 
 FuncDefNode::FuncDefNode( Node* type, Node* id, Node* plist, 
 Node* funcs, Node* ret ): Node( type, id ){
     this->plist = plist;
     this->funcs = funcs;
     this->ret   = ret;
+}
+
+bool FuncDefNode::populateTables( TypeChecker* tc ){
+    string type;
+    string name;
+    vector<string> params;
+    if( !left->tryGetId( type ) ){
+        // ERROR
+        return false;
+    }
+    if( !right->tryGetId( name ) ){
+        // ERROR
+        return false;
+    }
+    if( plist && !plist->tryGatherParams( params ) ){
+        // ERROR
+        return false;
+    }
+    if( !tc->registerFunction( name, params, type ) ){
+        // ERROR
+        return false;
+    }
+    return true;
+}
+
+bool FuncDefNode::typeCheck( TypeChecker* tc ){
+    bool toRet = true;
+    // Check all function calls
+    if( funcs ){
+        toRet = funcs->typeCheck( tc );
+    }
+    // Check return type
 }
 
 void FuncDefNode::print(){
@@ -78,6 +159,11 @@ TypeNode::TypeNode( string val ){
     this->val = val;
 }
 
+bool TypeNode::tryGetId( string& result ){
+    result = val;
+    return true;
+}
+
 void TypeNode::print(){
     cout << "TypeNode" << endl;
 }
@@ -92,7 +178,25 @@ void PlistNode::print(){
     if(right){ right->print(); }
 }
 
+bool PlistNode::tryGatherParams( vector<string>& result ){
+    if( left && left->tryGatherParams( result ) ){  
+        if( right ){ return right->tryGatherParams( result ); }
+        return true;
+    }
+    return false;
+}
+
 ParamNode::ParamNode( Node* type, Node* id ): Node( type, id ){}
+
+bool ParamNode::tryGatherParams( vector<string>& result ){
+    string entry;
+    if( !left->tryGetId( entry ) ){
+        // ERROR
+        return false;
+    }
+    result.push_back( entry );
+    return true;
+}
 
 void ParamNode::print(){
     cout << "ParamNode" << endl;
@@ -126,6 +230,13 @@ void ArgNode::print(){
 FuncCallsNode::FuncCallsNode( Node* funcCall, Node* next ):
 Node( funcCall, next ){}
 
+bool FuncCallsNode::typeCheck( TypeChecker* tc ){
+    if( right ){
+        return left->typeCheck( tc ) && right->typeCheck( tc );
+    }
+    return left->typeCheck( tc );
+}
+
 void FuncCallsNode::print(){
     cout << "FuncCallsNode" << endl;
     left->print();
@@ -134,6 +245,18 @@ void FuncCallsNode::print(){
 
 
 FuncCallNode::FuncCallNode( Node* id, Node* alist ): Node( id, alist ){}
+
+bool FuncCallNode::typeCheck( TypeChecker* tc ){
+    // gather args and then see if a function with this signature exists
+    vector<string> args;
+    string name;
+    if( right ){ right->gatherArgs( tc, args ); }
+    if( left->tryGetId( name ) ){
+        return tc->exists( name, args );
+    }
+    // ERROR
+    return false;
+}
 
 void FuncCallNode::print(){
     cout << "FuncCallNode" << endl;

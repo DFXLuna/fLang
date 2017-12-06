@@ -4,7 +4,7 @@ flang
 *.tab.*
 flang_lex.cpp
 .vscode*
-test
+*.bak
 
 # Prerequisites
 *.d

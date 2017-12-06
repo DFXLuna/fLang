@@ -1,16 +1,22 @@
 #ifndef NODE_H
 #define NODE_H
 #include<string>
+using std::string;
 #include<iostream>
 using std::cout;
 using std::endl;
-using std::string;
+#include"TypeChecker.h"
+
 
 class Node {
 public:
     Node( Node* left = 0, Node* right = 0 );
     virtual ~Node();
     virtual void print();
+    virtual bool populateTables( TypeChecker* tc );
+    virtual bool tryGetId( string& result );
+    virtual bool tryGatherParams( vector<string>& result );
+    virtual bool typeCheck( TypeChecker* tc );
 protected:
     Node* left;
     Node* right;
@@ -21,15 +27,16 @@ protected:
 class IdNode : public Node {
 public:
     IdNode( string val );
-    void print();
+    bool tryGetId( string& result ) override;
+    void print() override;
 private:
     string val;
 };
 
 class NumNode : public Node {
 public:
-    NumNode( int );
-    void print();
+    NumNode( int val );
+    void print() override;
 private:
     int val;
 };
@@ -37,7 +44,9 @@ private:
 class ProgramNode : public Node {
 public:
     ProgramNode( Node* funcdefs = 0, Node* main = 0 );
-    void print();
+    bool populateTables( TypeChecker* tc ) override;
+    bool typeCheck( TypeChecker* tc );
+    void print() override;
 };
 
 /////////////////////////////////////////
@@ -45,7 +54,9 @@ public:
 class FuncDefsNode : public Node {
 public:
     FuncDefsNode( Node* FuncDef = 0, Node* next = 0 );
-    void print();
+    bool populateTables( TypeChecker* tc ) override;
+    bool typeCheck( TypeChecker* tc ) override;
+    void print() override;
 };
 
 
@@ -53,7 +64,9 @@ class FuncDefNode : public Node {
 public:
     FuncDefNode( Node* type = 0, Node* id = 0, 
                  Node* plist = 0, Node* funcs = 0, Node* ret = 0 );
-    void print(); 
+    bool populateTables( TypeChecker* tc ) override;
+    bool typeCheck( TypeChecker* tc ) override;
+    void print() override; 
     ~FuncDefNode();
 private:
     Node* ret;
@@ -66,7 +79,8 @@ private:
 class TypeNode : public Node {
 public:
     TypeNode( string val );
-    void print();
+    bool tryGetId( string& result );
+    void print() override;
 private:
     string val;
 };
@@ -76,13 +90,15 @@ private:
 class PlistNode : public Node {
 public:
     PlistNode( Node* param = 0, Node* next = 0 );
-    void print();
+    bool tryGatherParams( vector<string>& result ) override;
+    void print() override;
 };
 
 class ParamNode : public Node {
 public:
     ParamNode( Node* type = 0, Node* id = 0 );
-    void print();
+    bool tryGatherParams( vector<string>& result ) override;
+    void print() override;
 };
 
 /////////////////////////////////////////
@@ -91,13 +107,13 @@ public:
 class AlistNode : public Node {
 public:
     AlistNode( Node* arg = 0, Node* next = 0 );
-    void print();
+    void print() override;
 };
 
 class ArgNode : public Node {
 public:
     ArgNode( Node* expr = 0 );
-    void print();
+    void print() override;
 };
 
 
@@ -107,13 +123,15 @@ public:
 class FuncCallsNode : public Node {
 public:
     FuncCallsNode( Node* funcCall = 0, Node* next = 0 );
-    void print();
+    bool typeCheck( TypeChecker* tc ) override;
+    void print() override;
 };
 
 class FuncCallNode : public Node {
 public:
     FuncCallNode( Node* id = 0, Node* alist = 0 );
-    void print();
+    bool typeCheck( TypeChecker* tc ) override;
+    void print() override;
 };
 
 /////////////////////////////////////////
@@ -121,7 +139,7 @@ public:
 class MainNode : public Node {
 public:
     MainNode( Node* plist = 0, Node* funccalls = 0 );
-    void print();
+    void print() override;
 };
 
 /////////////////////////////////////////
@@ -129,7 +147,7 @@ public:
 class ReturnNode : public Node {
 public:
     ReturnNode( Node* expr = 0 );
-    void print();
+    void print() override;
 };
 
 
@@ -138,7 +156,7 @@ public:
 class PrimitiveExprNode : public Node {
 public:
     PrimitiveExprNode( Node* p = 0 );
-    void print();
+    void print() override;
 };
 
 /////////////////////////////////////////

@@ -2,17 +2,20 @@
 #include<iostream>
 #include<FlexLexer.h>
 #include"flang.tab.h"
-using namespace std;
+#include"TypeChecker.h"
+using std::cout;
+using std::endl;
 
 Node* tree;
 yyFlexLexer scanner;
 
 int main(){
+    TypeChecker tc;
     tree = 0;
     yyparse();
     if( tree != 0 ){
-        cout << "Success!" << endl;
-        tree->print();
+        tree->populateTables( &tc );
+        tc.dump();
     }
     return 0;
 }

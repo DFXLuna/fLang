@@ -1,0 +1,4 @@
+Finish typecheck
+    - Gather args
+    - tc::exists
+    - tc::getType
