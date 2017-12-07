@@ -20,7 +20,22 @@ bool Node::tryGatherParams( vector<string>& result ){
     return false;
 }
 
+bool Node::gatherArgs( vector<string> args, TypeChecker* tc ){
+    //Error
+    return false;
+}
+
+bool Node::checkReturn( string type, TypeChecker* tc ){
+    // ERROR
+    return false;
+}
+
 bool Node::typeCheck( TypeChecker* tc ){
+    // ERROR
+    return false;
+}
+
+bool Node::tryGetType( string& result, TypeChecker* tc ){
     // ERROR
     return false;
 }
@@ -40,6 +55,11 @@ Node::~Node(){
 NumNode::NumNode( int val ): Node( 0, 0 ){
     this->val = val;
 }
+bool NumNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "int";
+    return true;
+}
+
 void NumNode::print(){
     cout << "NumNode" << endl;
 }
@@ -135,12 +155,27 @@ bool FuncDefNode::populateTables( TypeChecker* tc ){
 }
 
 bool FuncDefNode::typeCheck( TypeChecker* tc ){
-    bool toRet = true;
+    bool funcCheck = true;
+    bool retCheck = true;
     // Check all function calls
     if( funcs ){
-        toRet = funcs->typeCheck( tc );
+        funcCheck = funcs->typeCheck( tc );
     }
     // Check return type
+    string type;
+    if( !left->tryGetId( type ) ){
+        // ERROR
+        return false;
+    }
+    if( ret ){
+        retCheck = ret->checkReturn( type, tc );
+    }
+    else{
+        // ERROR
+        return false;
+    }
+    return retCheck && funcCheck;
+
 }
 
 void FuncDefNode::print(){
@@ -215,6 +250,10 @@ void AlistNode::print(){
     if(right){ right->print(); }
 }
 
+bool AlistNode::gatherArgs( vector<string>, TypeChecker* tc ){
+    return false;
+}
+
 
 ArgNode::ArgNode( Node* expr ): Node( expr, 0 ){}
 
@@ -250,12 +289,30 @@ bool FuncCallNode::typeCheck( TypeChecker* tc ){
     // gather args and then see if a function with this signature exists
     vector<string> args;
     string name;
-    if( right ){ right->gatherArgs( tc, args ); }
+    if( right && !right->gatherArgs( args, tc ) ){
+        // ERROR
+        return false;
+    }
     if( left->tryGetId( name ) ){
         return tc->exists( name, args );
     }
     // ERROR
     return false;
+}
+
+bool FuncCallNode::tryGetType( string& result, TypeChecker* tc ){
+   // gather args and then see if a function with this signature exists
+    vector<string> args;
+    string name;
+    if( right && !right->gatherArgs( args, tc ) ){
+        // ERROR
+        return false;
+    }
+    if( left->tryGetId( name ) ){
+        return tc->tryResolveType( name, args, result );
+    }
+    // ERROR
+    return false; 
 }
 
 void FuncCallNode::print(){
@@ -282,6 +339,15 @@ void MainNode::print(){
 
 ReturnNode::ReturnNode( Node* expr ): Node( expr, 0 ){}
 
+bool ReturnNode::checkReturn( string type, TypeChecker* tc ){
+    string retType ;
+    if( left->tryGetType( retType, tc ) ){
+        // return tc->checkTypes( type, retType );
+    }
+    // Error
+    return false;
+}
+
 void ReturnNode::print(){
     cout << "ReturnNode" << endl;
     left->print();
@@ -292,6 +358,10 @@ void ReturnNode::print(){
 // Primitive Expression
 
 PrimitiveExprNode::PrimitiveExprNode( Node* p ): Node( p, 0 ){}
+
+bool PrimitiveExprNode::tryGetType( string& result, TypeChecker* tc ){
+    return left->tryGetType( result, tc );
+}
 
 void PrimitiveExprNode::print(){
     cout << "PrimitiveExprNode" << endl;
@@ -304,54 +374,144 @@ void PrimitiveExprNode::print(){
 
 SumNode::SumNode( Node* l, Node* r ): Node( l, r ){}
 
+bool SumNode::tryGetType( string& result, TypeChecker* tc ){
+    // string ltype;
+    // string rtype;
+    // if( !left->tryGetType( ltype, tc ) || !right->tryGetType( rtype, tc ) ){
+    //     // ERROR
+    //     return false;
+    // }
+    // if( ltype != rtype || ltype != "int" ){
+    //     // ERROR
+    //     return false;
+    // }
+    result = "int";
+    return true;
+}
+
 //// 
 
 MinusNode::MinusNode( Node* l, Node* r ): Node( l, r ){}
 
+bool MinusNode::tryGetType( string& result, TypeChecker* tc ){
+    // string ltype;
+    // string rtype;
+    // if( !left->tryGetType( ltype, tc ) || !right->tryGetType( rtype, tc ) ){
+    //     // ERROR
+    //     return false;
+    // }
+    // if( ltype != rtype || ltype != "int" ){
+    //     // ERROR
+    //     return false;
+    // }
+    result = "int";
+    return true;
+}
+
 // Relation Nodes
 EqNode::EqNode( Node* l, Node* r ): Node( l, r ){}
+
+bool EqNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "bool";
+    return true;
+}
 
 //// 
 
 NeqNode::NeqNode( Node* l, Node* r ): Node( l, r ){}
 
+bool NeqNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "bool";
+    return true;
+}
+
 //// 
 
 LeqNode::LeqNode( Node* l, Node* r ): Node( l, r ){}
+
+bool LeqNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "bool";
+    return true;
+}
 
 //// 
 
 GeqNode::GeqNode( Node* l, Node* r ): Node( l, r ){}
 
+bool GeqNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "bool";
+    return true;
+}
+
 //// 
 
 LessNode::LessNode( Node* l, Node* r ): Node( l, r ){}
 
+bool LessNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "bool";
+    return true;
+}
+
 //
 
 GreaterNode::GreaterNode( Node* l, Node* r ): Node( l, r ){}
+
+bool GreaterNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "bool";
+    return true;
+}
 
 /////////////////////////////////////////
 // Product nodes
 
 TimesNode::TimesNode( Node* l, Node* r ): Node( l, r ){}
 
+bool TimesNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "int";
+    return true;
+}
+
 //// 
 
 DivNode::DivNode( Node* l, Node* r ): Node( l, r ){}
+
+bool DivNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "int";
+    return true;
+}
 
 //// 
 
 ModNode::ModNode( Node* l, Node* r ): Node( l, r ){}
 
+bool ModNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "int";
+    return true;
+}
+
+
 // Unary nodes
 
 UMinusNode::UMinusNode( Node* r ): Node( 0, r ){}
+
+bool UMinusNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "int";
+    return true;
+}
 
 //// 
 
 UPlusNode::UPlusNode( Node* r ): Node( 0, r ){}
 
+bool UPlusNode::tryGetType( string& result, TypeChecker* tc ){
+    result = "int";
+    return true;
+}
+
 ////
 
 ParenNode::ParenNode( Node* l ): Node( l, 0 ){}
+
+bool ParenNode::tryGetType( string& result, TypeChecker* tc ){
+    return left->tryGetType( result, tc );
+}

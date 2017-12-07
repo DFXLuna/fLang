@@ -1,4 +1,4 @@
 Finish typecheck
+    - Remove tc from trygetType
     - Gather args
-    - tc::exists
-    - tc::getType
+    - tc::exists, compare

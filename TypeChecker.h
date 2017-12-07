@@ -20,9 +20,10 @@ class TypeChecker {
 public:
     TypeChecker();
     ~TypeChecker();
-    // bool contains( string name, vector<string> argTypes, string retType );
+    bool exists( string name, vector<string> argTypes ) const;
     // bool contains( string type );
 
+    bool tryResolveType( string name, vector<string> argTypes, string& result );
     bool registerFunction( string name, vector<string> argTypes, string retType );
     void populateTypeTable();
 
@@ -47,6 +48,10 @@ class FunctionTable {
 public:
     void registerFunction( string name, vector<TypeDecl*> argTypes,
     TypeDecl* retType );
+
+    bool exists( string name, vector<TypeDecl*> args) const;
+    bool tryResolveType( string name, vector<TypeDecl*> args, string& result );
+    
     void dump() const;
 private:
     map< string, vector<MethDecl> > table;

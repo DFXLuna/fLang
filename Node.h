@@ -16,7 +16,10 @@ public:
     virtual bool populateTables( TypeChecker* tc );
     virtual bool tryGetId( string& result );
     virtual bool tryGatherParams( vector<string>& result );
+    virtual bool gatherArgs( vector<string>, TypeChecker* tc );
     virtual bool typeCheck( TypeChecker* tc );
+    virtual bool checkReturn( string type, TypeChecker* tc );
+    virtual bool tryGetType( string& result, TypeChecker* tc );
 protected:
     Node* left;
     Node* right;
@@ -36,6 +39,7 @@ private:
 class NumNode : public Node {
 public:
     NumNode( int val );
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     void print() override;
 private:
     int val;
@@ -107,6 +111,7 @@ public:
 class AlistNode : public Node {
 public:
     AlistNode( Node* arg = 0, Node* next = 0 );
+    bool gatherArgs( vector<string> args, TypeChecker* tc ) override;
     void print() override;
 };
 
@@ -131,6 +136,7 @@ class FuncCallNode : public Node {
 public:
     FuncCallNode( Node* id = 0, Node* alist = 0 );
     bool typeCheck( TypeChecker* tc ) override;
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     void print() override;
 };
 
@@ -147,6 +153,7 @@ public:
 class ReturnNode : public Node {
 public:
     ReturnNode( Node* expr = 0 );
+    bool checkReturn( string type, TypeChecker* tc ) override;
     void print() override;
 };
 
@@ -156,6 +163,7 @@ public:
 class PrimitiveExprNode : public Node {
 public:
     PrimitiveExprNode( Node* p = 0 );
+    bool tryGetType( string& type, TypeChecker* tc ) override;
     void print() override;
 };
 
@@ -165,11 +173,13 @@ public:
 // Sum/Unary Operators
 class MinusNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     MinusNode( Node* l = 0, Node* r = 0 );
 };
 
 class SumNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     SumNode( Node* l = 0, Node* r = 0 );
 };
 
@@ -177,47 +187,56 @@ public:
 
 class EqNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     EqNode( Node* l = 0, Node* r = 0 );
 };
 
 class NeqNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     NeqNode( Node* l = 0, Node* r = 0 );
 };
 
 class LeqNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     LeqNode( Node* l = 0, Node* r = 0 );
 };
 
 class GeqNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     GeqNode( Node* l = 0, Node* r = 0 );
 };
 
 class LessNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     LessNode( Node* l = 0, Node* r = 0 );
 };
 
 class GreaterNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     GreaterNode( Node* l = 0, Node* r = 0 );
 };
 
 // Product Nodes
 class TimesNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     TimesNode( Node* l = 0, Node* r = 0 );
 };
 
 class DivNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     DivNode( Node* l = 0, Node* r = 0 );
 };
 
 class ModNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     ModNode( Node* l = 0, Node* r = 0 );
 };
 
@@ -225,16 +244,19 @@ public:
 
 class UMinusNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     UMinusNode( Node* r = 0 );
 };
 
 class UPlusNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     UPlusNode( Node* r = 0 );
 };
 
 class ParenNode : public Node {
 public:
+    bool tryGetType( string& result, TypeChecker* tc ) override;
     ParenNode( Node* l = 0 );
 };
 

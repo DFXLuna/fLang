@@ -11,13 +11,42 @@ TypeChecker::~TypeChecker(){
     delete tTable;
 }
 
+bool TypeChecker::exists( string name, vector<string> argTypes ) const{
+    vector<TypeDecl*> args;
+    TypeDecl* temp = 0;
+    for( const auto i : argTypes ){
+        if( tTable->tryGetType( i, temp ) ){
+            args.push_back( temp );
+        }
+        else{
+            return false;
+        }
+    }
+    return fTable->exists( name, args );
+}
+
 void TypeChecker::populateTypeTable(){
     registerType("int");
     registerType("void");
+    registerType("bool");
 }
 
 void TypeChecker::registerType( string name ){
     tTable->registerType( name );
+}
+
+bool TypeChecker::tryResolveType( string name, vector<string> argTypes, string& result ){
+   vector<TypeDecl*> args;
+    TypeDecl* temp = 0;
+    for( const auto i : argTypes ){
+        if( tTable->tryGetType( i, temp ) ){
+            args.push_back( temp );
+        }
+        else{
+            return false;
+        }
+    }
+    return fTable->tryResolveType( name, args, result );
 }
 
 bool TypeChecker::registerFunction( string name, vector<string> argTypes, string retType ){
@@ -63,6 +92,33 @@ vector<TypeDecl*> argTypes, TypeDecl* retType ){
         temp.push_back( entry );
         table[name] = temp;
     }
+}
+
+bool FunctionTable::exists( string name, vector<TypeDecl*> args ) const{
+    auto it = table.begin();
+    if( ( it = table.find(name) ) != table.end() ){
+        for( const auto j : it->second ){
+            if( args == j.getArgTypes() ){
+                return true;
+            }
+        }
+        return false;
+    }
+    return false;
+}
+
+bool FunctionTable::tryResolveType( string name, vector<TypeDecl*> args, string& result ){
+    auto it = table.begin();
+    if( ( it = table.find(name) ) != table.end() ){
+        for( const auto j : it->second ){
+            if( args == j.getArgTypes() ){
+                result = j.getRetType()->getName();
+                return true;
+            }
+        }
+        return false;
+    }
+    return false; 
 }
 
 void FunctionTable::dump() const {
